@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/ncr-learning-web-app
+  IMAGE_NAME: ghcr.io/praveenaggarwal/ncr-learning-web-app
 
 jobs:
   build-and-push:
