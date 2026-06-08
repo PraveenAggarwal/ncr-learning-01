@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/praveenaggarwal/ncr-learning-web-app
+  tag: "1.0.0"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+app:
+  message: "Hello from the Edge!"
+
+service:
+  type: ClusterIP
+  port: 5000
