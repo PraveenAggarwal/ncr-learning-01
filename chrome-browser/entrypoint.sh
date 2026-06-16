@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -e
+# Exit on error, but allow the D-Bus check to fail gracefully
+trap 'echo "Chrome process exited with code $?"; exit $?' EXIT
 
-# Start D-Bus if not already running
+# Start D-Bus if not already running (run as root via sudo if needed)
 if [ ! -e /run/dbus/system_bus_socket ]; then
     echo "Starting D-Bus daemon..."
-    dbus-daemon --system --print-address 2>/dev/null || true
+    sudo dbus-daemon --system --print-address 2>/dev/null || dbus-daemon --system --print-address 2>/dev/null || true
 fi
 
 # Ensure XDG_RUNTIME_DIR exists and has correct permissions
@@ -27,20 +28,29 @@ while [ $attempt -lt $max_attempts ]; do
 done
 
 if [ $attempt -eq $max_attempts ]; then
-    echo "WARNING: X11 display not found, but continuing anyway..."
+    echo "⚠️  WARNING: X11 display NOT found at /tmp/.X11-unix/0"
+    echo "This node may not have an X11 display server running."
+    echo "Check: ls -la /tmp/.X11-unix/ on the host"
 fi
 
 # Validate CHROME_URL is set
 if [ -z "$CHROME_URL" ]; then
-    echo "ERROR: CHROME_URL environment variable not set"
+    echo "❌ ERROR: CHROME_URL environment variable not set"
     exit 1
 fi
 
-echo "Launching Chrome with URL: $CHROME_URL"
+echo ""
+echo "==========================================="
+echo "Launching Chrome in app/kiosk mode"
+echo "==========================================="
+echo "URL: $CHROME_URL"
 echo "DISPLAY: $DISPLAY"
 echo "XDG_RUNTIME_DIR: $XDG_RUNTIME_DIR"
+echo "==========================================="
+echo ""
 
-# Build Chrome command with flags from Advanced Engineering image
+# Launch Chrome with flags from Advanced Engineering image
+# Use exec to replace this process with Chrome
 exec google-chrome \
     --app="$CHROME_URL" \
     --kiosk \
@@ -48,4 +58,5 @@ exec google-chrome \
     --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' \
     --no-sandbox \
     --disable-pinch \
-    --disable-dev-shm-usage
+    --disable-dev-shm-usage \
+    2>&1

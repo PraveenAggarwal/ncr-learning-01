@@ -18,12 +18,14 @@ RUN apt-get install -y \
     pulseaudio \
     ca-certificates \
     curl \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# Create chrome user
-RUN useradd -m -s /bin/bash chrome
+# Create chrome user and allow it to run sudo without password
+RUN useradd -m -s /bin/bash chrome && \
+    echo "chrome ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Setup X11 and XDG runtime directories
+# Setup X11 and XDG runtime directories with open permissions
 RUN mkdir -p /tmp/.X11-unix /tmp/xdg_runtime && \
     chmod 1777 /tmp/.X11-unix && \
     chmod 1777 /tmp/xdg_runtime
@@ -38,6 +40,9 @@ ENV DISPLAY=":0.0"
 ENV XDG_RUNTIME_DIR="/tmp/xdg_runtime"
 ENV DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
 ENV PULSE_SERVER="/tmp/xdg_runtime/pa.socket"
+
+# Run as chrome user but with sudo access for D-Bus
+USER chrome
 
 # No exposed ports — rendering to X11 display
 ENTRYPOINT ["/entrypoint.sh"]
