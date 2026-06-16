@@ -1,6 +1,6 @@
 apiVersion: v2
 name: ncr-learning-chrome
-description: A Chrome browser container with X11 display for learning Edge ICP deployments
+description: A Chrome browser container with X11 display for learning Edge ICP deployments - supports flexible node targeting via labels
 type: application
-version: 2.0.0
+version: 2.1.0
 appVersion: "2.0.0"

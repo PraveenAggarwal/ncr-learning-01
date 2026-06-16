@@ -14,8 +14,16 @@ chrome:
   disablePinch: true
 
 # Node selector for targeting specific nodes with displays
+# Leave empty {} to deploy on any available node
+# Examples:
+#   nodeSelector:
+#     cl:browser-01: ""        # Deploy to nodes labeled with cl:browser-01
+#   nodeSelector:
+#     cl:digital-signage: ""   # Deploy to all nodes with digital-signage label
+#   nodeSelector:
+#     display-enabled: "true"  # Deploy to nodes with display-enabled=true
+# Multiple nodes with matching labels will each get a pod (if replicaCount > 1)
 nodeSelector: {}
-  # cl:browser-01: ""
 
-# Tolerations for node taints
+# Tolerations for node taints (if display nodes have taints)
 tolerations: []
