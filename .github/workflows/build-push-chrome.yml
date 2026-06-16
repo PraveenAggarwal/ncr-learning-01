@@ -31,4 +31,6 @@ jobs:
           context: ./chrome-browser
           push: true
           provenance: false
-          tags: ghcr.io/praveenaggarwal/ncr-learning-chrome:1.0.0
+          tags: |
+            ghcr.io/praveenaggarwal/ncr-learning-chrome:2.0.0
+            ghcr.io/praveenaggarwal/ncr-learning-chrome:latest

@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/praveenaggarwal/ncr-learning-chrome
+  tag: "2.0.0"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+chrome:
+  url: "http://example.com"
+  kiosk: true
+  disablePinch: true
+
+# Node selector for targeting specific nodes with displays
+nodeSelector: {}
+  # cl:browser-01: ""
+
+# Tolerations for node taints
+tolerations: []

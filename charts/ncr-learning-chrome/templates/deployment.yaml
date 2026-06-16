@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-chrome
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-chrome
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-chrome
+      annotations:
+        linkerd.io/inject: "disabled"
+    spec:
+      imagePullSecrets:
+        {{- range .Values.imagePullSecrets }}
+        - name: {{ .name }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: chrome
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: CHROME_URL
+              value: {{ .Values.chrome.url | quote }}
+            - name: DISPLAY
+              value: ":0.0"
+            - name: XDG_RUNTIME_DIR
+              value: "/tmp/xdg_runtime"
+            - name: DBUS_SESSION_BUS_ADDRESS
+              value: "unix:path=/run/dbus/system_bus_socket"
+            - name: PULSE_SERVER
+              value: "/tmp/xdg_runtime/pa.socket"
+          volumeMounts:
+            - name: x11-unix
+              mountPath: /tmp/.X11-unix
+              readOnly: true
+            - name: xdg-runtime
+              mountPath: /tmp/xdg_runtime
+            - name: dbus-socket
+              mountPath: /run/dbus
+            - name: zoneinfo
+              mountPath: /usr/share/zoneinfo
+              readOnly: true
+            - name: machine-id
+              mountPath: /etc/machine-id
+              readOnly: true
+      volumes:
+        - name: x11-unix
+          hostPath:
+            path: /tmp/.X11-unix
+        - name: xdg-runtime
+          hostPath:
+            path: /tmp/xdg_runtime
+        - name: dbus-socket
+          hostPath:
+            path: /run/dbus
+        - name: zoneinfo
+          hostPath:
+            path: /usr/share/zoneinfo
+        - name: machine-id
+          hostPath:
+            path: /etc/machine-id
